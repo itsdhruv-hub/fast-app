@@ -1,11 +1,17 @@
 {
   "expo": {
-    "name": "Fasting Reminder",
-    "slug": "fasting-reminder",
+    "name": "Vrat Smaran",
+    "slug": "vrat-smaran",
+    "icon": "./assect/logoapp.png",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "scheme": "fastingreminder",
+    "splash": {
+      "image": "./assect/logoapp.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FBF8F3"
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.personal.fastingreminder"
@@ -13,8 +19,12 @@
     "android": {
       "package": "com.personal.fastingreminder",
       "adaptiveIcon": {
-        "backgroundColor": "#F7E6CA"
+        "foregroundImage": "./assect/logoapp.png",
+        "backgroundColor": "#FBF8F3"
       }
+    },
+    "web": {
+      "favicon": "./assect/logoapp.png"
     },
     "plugins": [
       [

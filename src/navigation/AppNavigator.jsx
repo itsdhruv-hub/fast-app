@@ -8,6 +8,11 @@ import CalendarScreen from '../screens/CalendarScreen';
 import HistoryScreen from '../screens/HistoryScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import AddFastScreen from '../screens/AddFastScreen';
+import AddFastChoiceScreen from '../screens/AddFastChoiceScreen';
+import ReminderTimesScreen from '../screens/ReminderTimesScreen';
+import FastDetailsScreen from '../screens/FastDetailsScreen';
+import WeeklyFastScreen from '../screens/WeeklyFastScreen';
+import RecurringFastListScreen from '../screens/RecurringFastListScreen';
 
 const Tabs = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -27,5 +32,10 @@ export default function AppNavigator() {
   return <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
     <Stack.Screen name="Main" component={MainTabs} />
     <Stack.Screen name="AddFast" component={AddFastScreen} options={{ presentation: 'modal' }} />
+    <Stack.Screen name="AddFastChoice" component={AddFastChoiceScreen} options={{ presentation: 'modal' }} />
+    <Stack.Screen name="FastDetails" component={FastDetailsScreen} options={{ presentation: 'modal' }} />
+    <Stack.Screen name="WeeklyFast" component={WeeklyFastScreen} options={{ presentation: 'modal' }} />
+    <Stack.Screen name="RecurringFastList" component={RecurringFastListScreen} options={{ presentation: 'modal' }} />
+    <Stack.Screen name="ReminderTimes" component={ReminderTimesScreen} options={{ presentation: 'modal' }} />
   </Stack.Navigator>;
 }

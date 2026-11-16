@@ -19,7 +19,6 @@ export default function FastCard({ event, onPress, onSave, onDelete, compact = f
           <Text numberOfLines={1} style={styles.title}>{event.fastName}</Text>
           {event.isRecurring && <Repeat2 size={15} color={colors.accent} />}
         </View>
-        <Text style={styles.type}>{event.fastType}</Text>
         <View style={styles.metaRow}>
           {completed || saved ? <Check size={14} color={colors.green} /> : <CalendarDays size={14} color={colors.muted} />}
           <Text style={styles.meta}>{saved ? 'Saved in history' : completed ? 'Needs your review' : dateLabel(event.fastingDate)}</Text>
@@ -48,7 +47,6 @@ const styles = StyleSheet.create({
   details: { flex: 1 },
   titleRow: { alignItems: 'center', flexDirection: 'row', gap: 6 },
   title: { color: colors.ink, flexShrink: 1, fontSize: 15, fontWeight: '800' },
-  type: { color: colors.muted, fontSize: 12, marginTop: 3 },
   metaRow: { alignItems: 'center', flexDirection: 'row', gap: 5, marginTop: 8 },
   meta: { color: colors.muted, flex: 1, fontSize: 12 },
   actions: { flexDirection: 'row', gap: 18, marginTop: 10 },

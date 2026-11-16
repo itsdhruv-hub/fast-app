@@ -1,11 +1,27 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { AppState } from 'react-native';
 import { dataService } from '../services/dataService';
 import { cancelAll, configureNotifications, cancelForEvent, getNotificationPermission, rescheduleAll } from '../services/notificationService';
+import { isSupabaseConfigured } from '../services/supabase';
 import { defaultSettings, localStore } from '../services/storage';
 import { syncRecurringEvents } from '../services/recurrenceService';
-import { isPastDate } from '../utils/dateUtils';
+import { isPastDate, toDateOnly } from '../utils/dateUtils';
 
 const AppContext = createContext(null);
+
+const demoDate = (daysFromToday) => {
+  const date = new Date();
+  date.setHours(12, 0, 0, 0);
+  date.setDate(date.getDate() + daysFromToday);
+  return toDateOnly(date);
+};
+
+const demoEvents = [
+  { fastName: 'Poonam Fast', fastType: 'Poonam Fast', description: 'A peaceful full-moon fast.', fastingDate: demoDate(1), reminderEnabled: true, isRecurring: false },
+  { fastName: 'Ekadashi Fast', fastType: 'Ekadashi Fast', description: 'Keep the day calm and focused.', fastingDate: demoDate(3), reminderEnabled: true, isRecurring: false },
+  { fastName: 'Saturday Fast', fastType: 'Saturday Fast', description: 'A simple weekly devotional fast.', fastingDate: demoDate(6), reminderEnabled: true, isRecurring: false },
+  { fastName: 'Amavasya Fast', fastType: 'Amavasya Fast', description: 'Personal fasting reminder.', fastingDate: demoDate(9), reminderEnabled: true, isRecurring: false },
+];
 
 export const AppProvider = ({ children }) => {
   const [events, setEvents] = useState([]);
@@ -19,6 +35,19 @@ export const AppProvider = ({ children }) => {
     try {
       setError('');
       let nextEvents = await dataService.listEvents();
+      if (!isSupabaseConfigured && !(await localStore.getDemoDataSeeded())) {
+        const seededEvents = await Promise.all(demoEvents.map((event) => dataService.createEvent(event)));
+        nextEvents = [...nextEvents, ...seededEvents].sort((a, b) => a.fastingDate.localeCompare(b.fastingDate));
+        await localStore.saveDemoDataSeeded(true);
+      }
+      const expiredOneTime = nextEvents.filter((event) => !event.isRecurring && isPastDate(event.fastingDate));
+      if (expiredOneTime.length) {
+        for (const event of expiredOneTime) {
+          await cancelForEvent(event.id);
+          await dataService.deleteEvent(event.id);
+        }
+        nextEvents = nextEvents.filter((event) => event.isRecurring || !isPastDate(event.fastingDate));
+      }
       const storedSettings = await localStore.getSettings();
       const nextSettings = { ...defaultSettings, ...(storedSettings || {}) };
       nextEvents = await syncRecurringEvents(nextEvents);
@@ -44,6 +73,13 @@ export const AppProvider = ({ children }) => {
 
   useEffect(() => {
     configureNotifications().finally(refresh);
+  }, [refresh]);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') refresh();
+    });
+    return () => subscription.remove();
   }, [refresh]);
 
   const createEvent = async (input) => {

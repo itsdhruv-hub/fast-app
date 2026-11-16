@@ -20,6 +20,7 @@ const toLocal = (row) => ({
   isRecurring: Boolean(row.is_recurring),
   recurrenceDay: row.recurrence_day,
   recurrenceGroupId: row.recurrence_group_id || null,
+  recurrenceLimit: row.recurrence_limit ?? null,
   reminderEnabled: row.reminder_enabled !== false,
   status: row.status || 'upcoming',
   createdAt: row.created_at,
@@ -36,6 +37,7 @@ const toRow = (event) => ({
   is_recurring: Boolean(event.isRecurring),
   recurrence_day: event.recurrenceDay ?? null,
   recurrence_group_id: event.recurrenceGroupId || null,
+  recurrence_limit: event.recurrenceLimit ?? null,
   reminder_enabled: event.reminderEnabled !== false,
   status: event.status || 'upcoming',
   updated_at: new Date().toISOString(),
@@ -50,6 +52,7 @@ const toUpdateRow = (changes) => {
   if (changes.isRecurring !== undefined) row.is_recurring = Boolean(changes.isRecurring);
   if (changes.recurrenceDay !== undefined) row.recurrence_day = changes.recurrenceDay;
   if (changes.recurrenceGroupId !== undefined) row.recurrence_group_id = changes.recurrenceGroupId || null;
+  if (changes.recurrenceLimit !== undefined) row.recurrence_limit = changes.recurrenceLimit ?? null;
   if (changes.reminderEnabled !== undefined) row.reminder_enabled = changes.reminderEnabled !== false;
   if (changes.status !== undefined) row.status = changes.status;
   return row;

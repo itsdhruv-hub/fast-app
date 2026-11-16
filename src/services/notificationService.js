@@ -87,11 +87,12 @@ export const scheduleForEvent = async (event, settings) => {
   const today = startOfDay(new Date());
   if (eventDate < today) return [];
   const ids = [];
-  const times = settings.reminderTimes.slice(0, settings.dailyReminderFrequency);
+  const enabledTimes = settings.reminderTimeEnabled || [];
+  const times = (settings.reminderTimes || []).filter((time, index) => time && enabledTimes[index] !== false);
   for (let offset = 3; offset >= 1; offset -= 1) {
     const reminderDate = addDays(eventDate, -offset);
     for (const time of times) {
-      if (offset === 1 && time === settings.previousNightTime) continue;
+      if (offset === 1 && settings.previousNightReminderEnabled !== false && time === settings.previousNightTime) continue;
       const id = await schedule(
         event,
         timeToDate(event.fastingDate, time),
@@ -103,16 +104,21 @@ export const scheduleForEvent = async (event, settings) => {
     }
   }
   const nightDate = addDays(eventDate, -1);
-  const nightId = await schedule(
-    event,
-    timeToDate(`${nightDate.getFullYear()}-${String(nightDate.getMonth() + 1).padStart(2, '0')}-${String(nightDate.getDate()).padStart(2, '0')}`, settings.previousNightTime),
-    'Tomorrow is your fast',
-    `Reminder: Tomorrow is your ${event.fastName}. Don't forget!`,
-    'previous-night',
-  );
-  if (nightId) ids.push(nightId);
-  for (const time of [settings.morningTime, settings.eveningTime]) {
-    const id = await schedule(event, timeToDate(event.fastingDate, time), 'Fasting day', reminderBody(event, 0), 'fasting-day');
+  if (settings.previousNightTime && settings.previousNightReminderEnabled !== false) {
+    const nightId = await schedule(
+      event,
+      timeToDate(`${nightDate.getFullYear()}-${String(nightDate.getMonth() + 1).padStart(2, '0')}-${String(nightDate.getDate()).padStart(2, '0')}`, settings.previousNightTime),
+      'Tomorrow is your fast',
+      `Reminder: Tomorrow is your ${event.fastName}. Don't forget!`,
+      'previous-night',
+    );
+    if (nightId) ids.push(nightId);
+  }
+  for (const reminder of [
+    { time: settings.morningTime, enabled: settings.morningReminderEnabled },
+    { time: settings.eveningTime, enabled: settings.eveningReminderEnabled },
+  ].filter((item) => item.time && item.enabled !== false)) {
+    const id = await schedule(event, timeToDate(event.fastingDate, reminder.time), 'Fasting day', reminderBody(event, 0), 'fasting-day');
     if (id) ids.push(id);
   }
   const registry = await localStore.getNotificationRegistry();

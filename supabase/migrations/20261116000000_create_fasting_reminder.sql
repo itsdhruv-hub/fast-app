@@ -10,11 +10,15 @@ create table if not exists public.fasting_events (
   is_recurring boolean not null default false,
   recurrence_day integer check (recurrence_day between 0 and 6),
   recurrence_group_id text,
+  recurrence_limit integer check (recurrence_limit is null or recurrence_limit > 0),
   reminder_enabled boolean not null default true,
   status text not null default 'upcoming' check (status in ('upcoming', 'completed', 'saved')),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.fasting_events
+  add column if not exists recurrence_limit integer check (recurrence_limit is null or recurrence_limit > 0);
 
 create table if not exists public.fasting_history (
   id uuid primary key default gen_random_uuid(),
