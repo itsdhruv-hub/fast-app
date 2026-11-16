@@ -1,0 +1,30 @@
+{
+  "expo": {
+    "name": "Fasting Reminder",
+    "slug": "fasting-reminder",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "scheme": "fastingreminder",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.personal.fastingreminder"
+    },
+    "android": {
+      "package": "com.personal.fastingreminder",
+      "adaptiveIcon": {
+        "backgroundColor": "#F7E6CA"
+      }
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "color": "#D87537"
+        }
+      ],
+      "@react-native-community/datetimepicker",
+      "expo-status-bar"
+    ]
+  }
+}
